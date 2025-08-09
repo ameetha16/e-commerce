@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>E-Commerce Store</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 font-sans">
+
+  <!-- LOGIN PAGE -->
+<div id="loginPage" class="relative h-screen w-screen overflow-hidden flex items-center justify-center">
+
+  <!-- Shopping-related video background -->
+  <video autoplay muted loop playsinline class="absolute top-0 left-0 w-full h-full object-cover z-0" 
+    src="https://www.w3schools.com/html/mov_bbb.mp4">
+    Your browser does not support the video tag.
+  </video>
+  
+  <!-- Overlay to darken video for text readability -->
+  <div class="absolute top-0 left-0 w-full h-full bg-black/50 backdrop-blur-sm z-0"></div>
+
+  <!-- Glassmorphism login card -->
+  <div class="relative z-10 bg-white bg-opacity-10 backdrop-blur-md rounded-xl shadow-xl p-10 w-96 max-w-full text-white">
+    <h1 class="text-4xl font-extrabold mb-6 text-center drop-shadow-lg">🛍 ShopNow</h1>
+    <p class="mb-8 text-center text-lg font-semibold drop-shadow">Welcome back!<br> Please login to continue.</p>
+
+    <input id="username" type="text" placeholder="Username" class="w-full mb-5 p-3 rounded-lg bg-white bg-opacity-20 placeholder-white text-white focus:outline-none focus:ring-2 focus:ring-indigo-400 transition" />
+    <input id="password" type="password" placeholder="Password" class="w-full mb-6 p-3 rounded-lg bg-white bg-opacity-20 placeholder-white text-white focus:outline-none focus:ring-2 focus:ring-indigo-400 transition" />
+
+    <button onclick="login()" class="w-full py-3 rounded-lg bg-light bg-pink-500 hover:bg-pink-700 transition text-white font-bold text-lg shadow-lg shadow-pink-600/50">Login</button>
+  </div>
+
+</div>
+
+
+<!-- Reviews Modal -->
+
+<div id="reviewsModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex justify-center items-center z-40">
+  <div class="bg-white rounded-lg p-6 max-w-md w-full shadow-lg relative">
+    <button onclick="closeReviews()" class="absolute top-2 right-2 text-gray-600 hover:text-gray-900 text-xl font-bold">&times;</button>
+    <h3 id="reviewProductName" class="text-xl font-bold mb-4"></h3>
+    <div id="reviewList" class="max-h-60 overflow-y-auto space-y-3"></div>
+  </div>
+</div>
+
+
+
+  <!-- STORE PAGE -->
+  <div id="storePage" class="hidden">
+    <!-- Header -->
+    <header class="bg-white shadow p-4 flex justify-between items-center sticky top-0 z-20">
+      <h1 class="text-xl font-bold text-pink-600">ShopNow</h1>
+      <div class="flex items-center gap-4">
+        <input id="searchInput" type="text" placeholder="Search..." class="p-2 border rounded" />
+        <button onclick="toggleCart()" class="relative">
+          🛒
+          <span id="cartCount" class="absolute -top-2 -right-2 bg-pink-500 text-white text-xs rounded-full px-2">0</span>
+        </button>
+      </div>
+    </header>
+    
+
+    <!-- Deals of the Day -->
+<section class="relative p-4">
+    <!-- Background Video -->
+    <video autoplay muted loop playsinline poster="fallback-image.jpg" class="absolute top-0 left-0 w-full h-full object-cover z-0">
+      <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
+    </video>
+    <!-- Overlay -->
+    <div class="absolute top-0 left-0 w-full h-full bg-black/40 z-0"></div>
+  
+    <!-- Content -->
+    <div class="relative z-10">
+      <h2 class="text-lg md:text-2xl font-bold mb-2 text-white text-center">🔥 Deals of the Day</h2>
+      <p class="text-sm mb-4 text-center text-pink-200">Hurry! Offer ends in <span id="dealTimer">00:00:00</span></p>
+  
+      <div id="dealsContainer" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+        <!-- JS will insert products here -->
+      </div>
+    </div>
+  </section>
+
+   <!-- Filters -->
+<section class="p-4 bg-white flex gap-4 flex-wrap">
+    <select id="categoryFilter" class="p-2 border rounded">
+      <option value="all">All Categories</option>
+      <option value="electronics">Electronics</option>
+      <option value="clothing">Clothing</option>
+      <option value="furniture">Furniture</option>
+      <option value="accessories">Accessories</option>
+    </select>
+    <select id="priceFilter" class="p-2 border rounded">
+      <option value="all">All Prices</option>
+      <option value="low">Below $50</option>
+      <option value="high">Above $50</option>
+    </select>
+  </section>
+  
+
+    <!-- Product Grid -->
+    <section class="p-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6" id="productGrid"></section>
+  </div>
+
+<!-- CART SLIDE-IN -->
+<div id="cartPanel" class="fixed top-0 right-0 w-80 bg-white shadow-lg h-full transform translate-x-full transition-transform z-30 flex flex-col">
+    <div class="p-4 flex justify-between items-center border-b">
+      <h2 class="text-lg font-bold">Your Cart</h2>
+      <button onclick="toggleCart()">❌</button>
+    </div>
+    
+    <!-- Cart Items -->
+    <div id="cartItems" class="flex-1 overflow-y-auto p-4"></div>
+  
+    <!-- Checkout Form -->
+    <div id="checkoutForm" class="hidden flex-1 overflow-y-auto p-4">
+      <h3 class="font-bold mb-2">Checkout</h3>
+      <input type="text" id="checkoutName" placeholder="Full Name" class="w-full p-2 border rounded mb-2">
+      <input type="text" id="checkoutAddress" placeholder="Address" class="w-full p-2 border rounded mb-2">
+      <select id="checkoutPayment" class="w-full p-2 border rounded mb-4">
+        <option value="">Payment Method</option>
+        <option value="card">Credit/Debit Card</option>
+        <option value="cod">Cash on Delivery</option>
+      </select>
+      <button onclick="placeOrder()" class="w-full bg-pink-600 hover:bg-pink-700 text-white p-2 rounded">Place Order</button>
+    </div>
+  
+    <!-- Cart Footer -->
+    <div id="cartFooter" class="p-4 border-t">
+      <p class="font-bold">Total: $<span id="cartTotal">0.00</span></p>
+      <button onclick="showCheckout()" class="w-full bg-pink-500 hover:bg-pink-600 text-white p-2 rounded mt-2">Checkout</button>
+    </div>
+  </div>
+<!-- Featured Categories Section -->
+
+<section class="py-10 px-6 bg-gray-50">
+  <h2 class="text-3xl font-bold mb-6 text-gray-800"> Featured Categories</h2>
+  
+  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+    <div class="bg-white shadow-lg rounded-lg overflow-hidden hover:scale-105 transition">
+      <img src="https://images.unsplash.com/photo-1617043983671-adaadcaa2460?q=80&w=2340&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Smartwatch" class="w-full h-48 object-cover">
+      <div class="p-4">
+        <h3 class="text-lg font-semibold">Smartwatches</h3>
+        <p class="text-gray-600 text-sm">Track your fitness & style.</p>
+        <p class="text-green-600 font-bold mt-2">From ₹2,999</p>
+      </div>
+    </div>
+    
+    <div class="bg-white shadow-lg rounded-lg overflow-hidden hover:scale-105 transition">
+      <img src="https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?q=80&w=2340&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Laptops" class="w-full h-48 object-cover">
+      <div class="p-4">
+        <h3 class="text-lg font-semibold">Laptops</h3>
+        <p class="text-gray-600 text-sm">Power & performance.</p>
+        <p class="text-green-600 font-bold mt-2">From ₹25,000</p>
+      </div>
+    </div>
+
+    <div class="bg-white shadow-lg rounded-lg overflow-hidden hover:scale-105 transition">
+      <img src="https://images.unsplash.com/photo-1545958230-d91612d5ecd5?q=80&w=2340&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Home Decor" class="w-full h-48 object-cover">
+      <div class="p-4">
+        <h3 class="text-lg font-semibold">Home Decor</h3>
+        <p class="text-gray-600 text-sm">Make your space beautiful.</p>
+        <p class="text-green-600 font-bold mt-2">From ₹499</p>
+      </div>
+    </div>
+
+    <div class="bg-white shadow-lg rounded-lg overflow-hidden hover:scale-105 transition">
+      <img src="https://plus.unsplash.com/premium_photo-1679513691474-73102089c117?w=2400&auto=format&fit=crop&q=60&ixlib=rb-4.1.0" alt="Headphones" class="w-full h-48 object-cover">
+      <div class="p-4">
+        <h3 class="text-lg font-semibold">Headphones</h3>
+        <p class="text-gray-600 text-sm">Pure sound experience.</p>
+        <p class="text-green-600 font-bold mt-2">Add to Cart</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Best Sellers Section -->
+<section class="py-10 px-6">
+  <h2 class="text-3xl font-bold mb-6 text-gray-800"> Best Sellers</h2>
+  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+    <div class="bg-white shadow-lg rounded-lg overflow-hidden hover:scale-105 transition">
+      <img src="https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?q=80&w=2231&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Bluetooth Speaker" class="w-full h-48 object-cover">
+      <div class="p-4">
+        <h3 class="text-lg font-semibold">Bluetooth Speaker</h3>
+        <p class="text-gray-600 text-sm">Crisp sound anywhere.</p>
+        <p class="text-green-600 font-bold mt-2">₹1,499</p>
+      </div>
+    </div>
+
+    <div class="bg-white shadow-lg rounded-lg overflow-hidden hover:scale-105 transition">
+      <img src="https://images.unsplash.com/photo-1629429408209-1f912961dbd8?q=80&w=2340&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Gaming Mouse" class="w-full h-48 object-cover">
+      <div class="p-4">
+        <h3 class="text-lg font-semibold">Gaming Mouse</h3>
+        <p class="text-gray-600 text-sm">Precision and speed.</p>
+        <p class="text-green-600 font-bold mt-2">₹999</p>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="bg-gray-100 py-10">
+  <div class="max-w-7xl mx-auto px-4 text-center">
+    <h2 class="text-3xl font-bold mb-6 text-gray-800">Why Choose Us?</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      
+      <div class="bg-white p-6 rounded-xl shadow-lg hover:shadow-2xl transition duration-300">
+        <img src="https://img.icons8.com/color/96/fast-delivery.png" />
+        <h3 class="text-xl font-semibold text-gray-700 mb-2">Fast Delivery</h3>
+        <p class="text-gray-600">Get your orders delivered within 2–3 days with our trusted shipping partners.</p>
+      </div>
+
+      <div class="bg-white p-6 rounded-xl shadow-lg hover:shadow-2xl transition duration-300">
+        <img src="https://img.icons8.com/color/96/money-bag-euro.png" alt="Best Prices" class="mx-auto mb-4">
+        <h3 class="text-xl font-semibold text-gray-700 mb-2">Best Prices</h3>
+        <p class="text-gray-600">Enjoy unbeatable prices with seasonal discounts and daily offers.</p>
+      </div>
+
+
+      <div class="bg-white p-6 rounded-xl shadow-lg hover:shadow-2xl transition duration-300">
+        <img src="https://img.icons8.com/color/96/customer-support.png" alt="Support" class="mx-auto mb-4">
+        <h3 class="text-xl font-semibold text-gray-700 mb-2">24/7 Support</h3>
+        <p class="text-gray-600">Our friendly support team is always ready to help you with any queries.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+<footer class="bg-gray-900 text-white py-8">
+  <div class="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-8">
+
+    <div>
+      <h4 class="font-bold text-lg mb-3">About Us</h4>
+      <p class="text-gray-400 text-sm">We are committed to bringing you top-quality products at unbeatable prices, with fast delivery and great service.</p>
+    </div>
+
+    <div>
+      <h4 class="font-bold text-lg mb-3">Quick Links</h4>
+      <ul class="space-y-2 text-gray-400 text-sm">
+        <li><a href="#" class="hover:text-white">Home</a></li>
+        <li><a href="#" class="hover:text-white">Shop</a></li>
+        <li><a href="#" class="hover:text-white">Deals</a></li>
+        <li><a href="#" class="hover:text-white">Contact</a></li>
+      </ul>
+    </div>
+
+    <div>
+      <h4 class="font-bold text-lg mb-3">Customer Service</h4>
+      <ul class="space-y-2 text-gray-400 text-sm">
+        <li><a href="#" class="hover:text-white">FAQs</a></li>
+        <li><a href="#" class="hover:text-white">Returns & Refunds</a></li>
+        <li><a href="#" class="hover:text-white">Shipping Info</a></li>
+        <li><a href="#" class="hover:text-white">Privacy Policy</a></li>
+      </ul>
+    </div>
+
+    <div>
+      <h4 class="font-bold text-lg mb-3">Follow Us</h4>
+      <div class="flex space-x-4">
+        <a href="#"><img src="https://img.icons8.com/ios-filled/24/ffffff/facebook--v1.png" alt="Facebook"></a>
+        <a href="#"><img src="https://img.icons8.com/ios-filled/24/ffffff/instagram-new.png" alt="Instagram"></a>
+        <a href="#"><img src="https://img.icons8.com/ios-filled/24/ffffff/twitter--v1.png" alt="Twitter"></a>
+      </div>
+    </div>
+
+  </div>
+  <div class="text-center text-gray-500 text-sm mt-8 border-t border-gray-700 pt-4">
+    © 2025 YourStore. All rights reserved.
+  </div>
+</footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
